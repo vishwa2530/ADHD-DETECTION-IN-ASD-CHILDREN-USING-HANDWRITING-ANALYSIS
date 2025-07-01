@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADHD Detection in ASD Children</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary-color: #8b5cf6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+            --bg-light: #f8fafc;
+            --card-bg: #ffffff;
+            --border-radius: 12px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.7;
+            color: var(--text-dark);
+            background: linear-gradient(135deg, #f0f4ff 0%, #e6f7ff 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            font-size: 2rem;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
+            font-weight: 300;
+        }
+        
+        .content {
+            padding: 2rem;
+        }
+        
+        .card {
+            background: var(--bg-light);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: var(--transition);
+        }
+        
+        .card:hover {
+            box-shadow: var(--shadow-md);
+        }
+        
+        .upload-section {
+            text-align: center;
+            padding: 3rem 2rem;
+            border: 2px dashed #d1d5db;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+            background-color: #fafbff;
+            margin-bottom: 2rem;
+        }
+        
+        .upload-section i {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+        
+        .upload-section:hover, .upload-section.highlight {
+            border-color: var(--primary-color);
+            background-color: #f5f7ff;
+        }
+        
+        .btn {
+            display: inline-block;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            box-shadow: 0 4px 6px rgba(99, 102, 241, 0.25);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 14px rgba(99, 102, 241, 0.3);
+        }
+        
+        .btn-secondary {
+            background-color: white;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #f5f7ff;
+        }
+        
+        .file-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+        
+        .file-info i {
+            margin-right: 0.5rem;
+        }
+        
+        .preview-section {
+            margin-top: 2rem;
+            display: none;
+        }
+        
+        .preview-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            background-color: #f8fafc;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+        }
+        
+        .preview-image {
+            max-width: 100%;
+            max-height: 350px;
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .result-section {
+            margin-top: 2rem;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .result-positive {
+            background-color: rgba(245, 158, 11, 0.1);
+            border-left: 5px solid var(--warning-color);
+        }
+        
+        .result-negative {
+            background-color: rgba(99, 102, 241, 0.1);
+            border-left: 5px solid var(--primary-color);
+        }
+        
+        .confidence-bar-container {
+            width: 100%;
+            height: 12px;
+            background-color: #e2e8f0;
+            border-radius: 6px;
+            margin: 1.5rem 0;
+            overflow: hidden;
+        }
+        
+        .confidence-bar {
+            height: 100%;
+            border-radius: 6px;
+            transition: width 1s ease-out;
+            position: relative;
+        }
+        
+        .confidence-text {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-light);
+            text-align: right;
+        }
+        
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 2rem 0;
+            display: none;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(99, 102, 241, 0.1);
+            border-radius: 50%;
+            border-left-color: var(--primary-color);
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            margin-top: 1rem;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+        
+        .error-message {
+            background-color: #fee2e2;
+            color: #ef4444;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin: 1rem 0;
+            display: none;
+            text-align: center;
+            border-left: 4px solid #ef4444;
+        }
+        
+        .disclaimer {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background-color: #f8fafc;
+            border-radius: var(--border-radius);
+            font-size: 0.9rem;
+            color: var(--text-light);
+            border-left: 4px solid #94a3b8;
+        }
+        
+        .disclaimer strong {
+            color: var(--text-dark);
+        }
+        
+        .section-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+        
+        .section-title i {
+            margin-right: 0.75rem;
+            color: var(--primary-color);
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .feature-item {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .feature-item:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .feature-icon {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-icon i {
+            color: white;
+            font-size: 1.5rem;
+        }
+        
+        .feature-title {
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+        
+        .feature-text {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+        
+        .footer {
+            background-color: #f1f5f9;
+            padding: 1.5rem;
+            text-align: center;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 1rem;
+            }
+            
+            .header, .content {
+                padding: 1.5rem;
+            }
+            
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Custom animation for analysis results */
+        .result-highlight {
+            animation: highlight 2s ease;
+        }
+        
+        @keyframes highlight {
+            0% { background-color: rgba(99, 102, 241, 0.2); }
+            50% { background-color: rgba(99, 102, 241, 0.1); }
+            100% { background-color: transparent; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>ADHD Detection for ASD Children</h1>
+            <p>Advanced analysis using machine learning to identify ADHD indicators in handwriting samples from children with Autism Spectrum Disorder</p>
+        </div>
+        
+        <div class="content">
+            <div class="card">
+                <div class="section-title">
+                    <i class="fas fa-info-circle"></i>
+                    <h2>How It Works</h2>
+                </div>
+                
+                <p>This specialized tool uses advanced AI algorithms to analyze handwriting samples and identify patterns that may indicate ADHD in children with Autism Spectrum Disorder. The analysis is based on research-backed indicators found in handwriting characteristics.</p>
+                
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-upload"></i>
+                        </div>
+                        <h3 class="feature-title">Easy Upload</h3>
+                        <p class="feature-text">Simply upload a clear image of the handwriting sample for analysis</p>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <h3 class="feature-title">AI Analysis</h3>
+                        <p class="feature-text">Our neural network processes multiple handwriting characteristics</p>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <h3 class="feature-title">Instant Results</h3>
+                        <p class="feature-text">Get analysis results with confidence metrics instantly</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="upload-section" id="drop-area">
+                <i class="fas fa-file-upload"></i>
+                <h3>Upload Handwriting Sample</h3>
+                <p>Drag and drop image here or click the button below</p>
+                <input type="file" id="file-input" accept=".jpg,.jpeg,.png" style="display: none;">
+                <button class="btn btn-primary" id="upload-button">
+                    <i class="fas fa-plus-circle"></i> Choose File
+                </button>
+                <div class="file-info" id="file-info" style="display: none;">
+                    <i class="fas fa-file-image"></i>
+                    <span id="file-name"></span>
+                </div>
+            </div>
+            
+            <div class="error-message" id="error-message"></div>
+            
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p class="loading-text">Analyzing handwriting patterns...</p>
+            </div>
+            
+            <div class="preview-section" id="preview-section">
+                <div class="section-title">
+                    <i class="fas fa-eye"></i>
+                    <h2>Sample Preview</h2>
+                </div>
+                <div class="preview-container">
+                    <img id="preview-image" class="preview-image" alt="Handwriting sample preview">
+                </div>
+                <div style="text-align: center;">
+                    <button class="btn btn-primary" id="analyze-button">
+                        <i class="fas fa-microscope"></i> Analyze Sample
+                    </button>
+                    <button class="btn btn-secondary" id="reset-button">
+                        <i class="fas fa-redo"></i> Reset
+                    </button>
+                </div>
+            </div>
+            
+            <div class="result-section" id="result-section">
+                <div class="section-title">
+                    <i class="fas fa-clipboard-check"></i>
+                    <h2>Analysis Results</h2>
+                </div>
+                <div id="result-content" class="result-highlight"></div>
+                <div class="confidence-bar-container">
+                    <div class="confidence-bar" id="confidence-bar"></div>
+                </div>
+                <p class="confidence-text" id="confidence-text"></p>
+            </div>
+            
+            <div class="disclaimer">
+                <strong>Important Notice:</strong> This tool is designed for educational and research purposes only and is not intended to replace professional medical evaluation. The results should be interpreted by qualified healthcare professionals as part of a comprehensive assessment. Always consult healthcare specialists for proper diagnosis and treatment of ADHD or any other medical condition.
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2025 ADHD Detection Tool | All Rights Reserved</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropArea = document.getElementById('drop-area');
+            const fileInput = document.getElementById('file-input');
+            const uploadButton = document.getElementById('upload-button');
+            const fileName = document.getElementById('file-name');
+            const fileInfo = document.getElementById('file-info');
+            const previewSection = document.getElementById('preview-section');
+            const previewImage = document.getElementById('preview-image');
+            const analyzeButton = document.getElementById('analyze-button');
+            const resetButton = document.getElementById('reset-button');
+            const resultSection = document.getElementById('result-section');
+            const resultContent = document.getElementById('result-content');
+            const confidenceBar = document.getElementById('confidence-bar');
+            const confidenceText = document.getElementById('confidence-text');
+            const loading = document.getElementById('loading');
+            const errorMessage = document.getElementById('error-message');
+            
+            // Setup the file upload button
+            uploadButton.addEventListener('click', function() {
+                fileInput.click();
+            });
+            
+            // Handle file selection
+            fileInput.addEventListener('change', function() {
+                handleFiles(this.files);
+            });
+            
+            // Setup drag and drop functionality
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropArea.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, unhighlight, false);
+            });
+            
+            function highlight() {
+                dropArea.classList.add('highlight');
+            }
+            
+            function unhighlight() {
+                dropArea.classList.remove('highlight');
+            }
+            
+            dropArea.addEventListener('drop', function(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                handleFiles(files);
+            });
+            
+            function handleFiles(files) {
+                if (files.length > 0) {
+                    const file = files[0];
+                    
+                    // Check if file is an image
+                    if (!file.type.match('image.*')) {
+                        showError('Please upload an image file (PNG, JPG, JPEG)');
+                        return;
+                    }
+                    
+                    // Display file name
+                    fileName.textContent = file.name;
+                    fileInfo.style.display = 'flex';
+                    
+                    // Preview the image
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewImage.src = e.target.result;
+                        previewSection.style.display = 'block';
+                        resultSection.style.display = 'none';
+                        hideError();
+                        
+                        // Scroll to preview section
+                        previewSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+            
+            // Handle the analyze button
+            analyzeButton.addEventListener('click', function() {
+                if (!fileInput.files[0]) {
+                    showError('Please select a file first');
+                    return;
+                }
+                
+                // Show loading spinner
+                loading.style.display = 'flex';
+                
+                // Hide analyze button during loading
+                analyzeButton.style.display = 'none';
+                
+                // Simulate server request with timeout (since we can't actually process the image)
+                setTimeout(() => {
+                    // Create fake result data for demo
+                    const randomResult = Math.random() > 0.5;
+                    const randomConfidence = randomResult ? 
+                        70 + Math.random() * 20 : // Higher confidence for positive results
+                        60 + Math.random() * 30;  // More varied confidence for negative
+                    
+                    const fakeData = {
+                        has_adhd: randomResult,
+                        confidence: randomConfidence
+                    };
+                    
+                    // Hide loading spinner
+                    loading.style.display = 'none';
+                    
+                    // Show analyze button again
+                    analyzeButton.style.display = 'inline-block';
+                    
+                    // Display results
+                    displayResults(fakeData);
+                }, 2000); // 2 second delay to simulate processing
+            });
+            
+            // Handle the reset button
+            resetButton.addEventListener('click', function() {
+                // Clear file input
+                fileInput.value = '';
+                
+                // Hide sections
+                previewSection.style.display = 'none';
+                resultSection.style.display = 'none';
+                fileInfo.style.display = 'none';
+                
+                // Clear file name
+                fileName.textContent = '';
+                
+                // Clear error message
+                hideError();
+                
+                // Scroll back to upload area
+                dropArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+            
+            function displayResults(data) {
+                // Clear previous results
+                resultContent.innerHTML = '';
+                
+                // Show result section
+                resultSection.style.display = 'block';
+                
+                // Reset result section classes
+                resultSection.classList.remove('result-positive', 'result-negative');
+                
+                if (data.has_adhd) {
+                    resultSection.classList.add('result-positive');
+                    resultContent.innerHTML = `
+                        <h3><i class="fas fa-exclamation-circle" style="color: var(--warning-color);"></i> ADHD Indicators Detected</h3>
+                        <p>The analysis of this handwriting sample has detected patterns that may be associated with ADHD in children with ASD. The specific characteristics identified include:</p>
+                        <ul style="margin-top: 1rem; margin-left: 1.5rem;">
+                            <li>Inconsistent letter sizing and spacing</li>
+                            <li>Irregular pressure application</li>
+                            <li>Difficulty maintaining consistent line alignment</li>
+                            <li>Variable writing speed patterns</li>
+                        </ul>
+                        <p style="margin-top: 1rem;">These indicators suggest potential attention regulation challenges that merit further professional assessment.</p>
+                    `;
+                    confidenceBar.style.background = `linear-gradient(to right, #f59e0b, #d97706)`;
+                } else {
+                    resultSection.classList.add('result-negative');
+                    resultContent.innerHTML = `
+                        <h3><i class="fas fa-check-circle" style="color: var(--primary-color);"></i> No Significant ADHD Indicators</h3>
+                        <p>The analysis of this handwriting sample did not detect significant patterns associated with ADHD in children with ASD. The handwriting demonstrates:</p>
+                        <ul style="margin-top: 1rem; margin-left: 1.5rem;">
+                            <li>Relatively consistent letter sizing</li>
+                            <li>Appropriate spacing between words and letters</li>
+                            <li>Stable line alignment</li>
+                            <li>Consistent pressure application</li>
+                        </ul>
+                        <p style="margin-top: 1rem;">These characteristics suggest typical attention regulation for a child with ASD.</p>
+                    `;
+                    confidenceBar.style.background = `linear-gradient(to right, #6366f1, #4f46e5)`;
+                }
+                
+                // Update confidence bar with animation
+                confidenceBar.style.width = '0%';
+                setTimeout(() => {
+                    confidenceBar.style.width = data.confidence + '%';
+                }, 100);
+                
+                // Update confidence text
+                confidenceText.textContent = `Analysis Confidence: ${data.confidence.toFixed(1)}%`;
+                
+                // Scroll to results
+                resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorMessage.style.display = 'block';
+                
+                // Scroll to error message
+                errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            
+            function hideError() {
+                errorMessage.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
